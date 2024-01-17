@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.1'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = "com.axon"
+version = "0.0.1-SNAPSHOT"
+repositories {
+    mavenCentral()
+}
+sourceCompatibility = '17'
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    //mySQL
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    //axon framework
+    implementation 'org.axonframework:axon-spring-boot-starter:4.9.1'
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    //Apache utilities
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+
+    //gson
+    implementation 'com.google.code.gson:gson:2.10.1'
+}
+
+bootJar {
+    archiveFileName = "axonsample.jar"
+}
+
+test {
+    useJUnitPlatform()
+}
