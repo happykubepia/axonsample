@@ -6,7 +6,10 @@ import org.axon.dto.StatusEnum;
 import org.axon.entity.Elephant;
 import org.axon.repository.ElephantRepository;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.config.ProcessingGroup;
+import org.axonframework.eventhandling.AllowReplay;
 import org.axonframework.eventhandling.EventHandler;
+import org.axonframework.eventhandling.ResetHandler;
 import org.axonframework.eventhandling.gateway.EventGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,6 +18,8 @@ import java.util.Optional;
 
 @Slf4j
 @Component
+@ProcessingGroup("elephant")      //전체 Event Replay시 대상 class를 구별하기 위해 부여
+@AllowReplay                    //Event Replay를 활성화 함. 비활성화할 EventHandler에는 @DisallowReplay를 지정
 public class ElephantEventHandler {
     @Autowired
     private ElephantRepository elephantRepository;
@@ -89,5 +94,12 @@ public class ElephantEventHandler {
     private Elephant getEntity(String id) {
         Optional<Elephant> optElephant = elephantRepository.findById(id);
         return optElephant.isPresent() ? optElephant.get() : null;
+    }
+
+    //===================== 전체 이벤트 Replay하여 DB에 최종 상태 저장 ===========
+    @ResetHandler
+    private void replayAll() {
+        log.info("[@ResetHandler] Executing replayAll");
+        elephantRepository.deleteAll();
     }
 }
