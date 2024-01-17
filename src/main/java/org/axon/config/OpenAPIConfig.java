@@ -12,12 +12,12 @@ public class OpenAPIConfig {
     @Bean
     OpenAPI openAPI() {
         return new OpenAPI()
-                .info(new Info().title("Order API")
+                .info(new Info().title("Axon framework API")
                         .description("Axon Sample application")
                         .version("v0.0.1")
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")))
                 .externalDocs(new ExternalDocumentation()
                         .description("About Application")
-                        .url("https://happykubepia.github.io/agilemall-axon"));
+                        .url("https://happykubepia.github.io/axonsample"));
     }
 }
