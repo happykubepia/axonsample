@@ -1,0 +1,52 @@
+/'
+Elephant Sequence Diagram
+'/
+@startuml
+
+title Elephant Sequence Diagram 
+
+participant APIController as Controller
+participant ElephantService as Service
+queue AxonServer
+participant ElephantAggregate as Aggregate 
+database EventStore
+participant ElephantEventHandler as EventHandler
+participant ElephantQueryHandler as QueryHandler
+database elephantDB as Database  
+
+== Command ==
+autonumber
+Controller -> Service:코끼리 생성,넣기,꺼내기 요청 
+Service -> Service: Check Validation
+Service -> AxonServer: Command 발송 
+note right of Service: CommandGateway.send(command)
+Service -> Controller: Return(요청완료) 
+AxonServer -> Aggregate: Push Command 
+Aggregate <-> EventStore: Event Replay
+Aggregate -> Aggregate: Biz Logic 처리 
+Aggregate -> EventHandler: Event 생성 
+note right of Aggregate: AggregateLifecycle.apply(event)
+Aggregate -> EventStore: Event 추가 
+EventHandler -> Database: 코끼리 데이터 생성, 상태 변경  
+alt 실패시  
+autonumber stop 
+EventHandler --> AxonServer: 무게 100kg 이상 시 넣기 실패 Event 발송 
+note left of EventHandler: EventGateway.publish 
+end 
+
+== Query ==
+autonumber 
+Controller -> Service: 코끼리 리스트, 코끼리 정보 요청 
+Service -> QueryHandler: Query 요청 
+note right of Service: QueryGateway.query(query)
+QueryHandler <-> Database: Read Data 
+EventHandler -> Service: Return Data 
+
+== 코끼리 삭제 ==
+autonumber stop
+autonumber 
+Controller -> Service: 코끼리 삭제 요청 
+Service -> Database: 코끼리 삭제 
+@enduml
+
+
