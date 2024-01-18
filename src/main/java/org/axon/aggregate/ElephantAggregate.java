@@ -5,19 +5,16 @@ import org.axon.command.BackToReadyCommand;
 import org.axon.command.CreateElephantCommand;
 import org.axon.command.EnterElephantCommand;
 import org.axon.command.ExitElephantCommand;
-import org.axon.dto.StatusEnum;
 import org.axon.events.BackToReadyCompletedEvent;
 import org.axon.events.CreatedElephantEvent;
 import org.axon.events.EnteredElephantEvent;
 import org.axon.events.ExitedElephantEvent;
 import org.axonframework.commandhandling.CommandHandler;
-import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.modelling.command.AggregateMember;
 import org.axonframework.spring.stereotype.Aggregate;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 //@Aggregate
@@ -31,9 +28,6 @@ public class ElephantAggregate {
     private int weight;
     @AggregateMember
     private String status;
-
-    @Autowired
-    private transient CommandGateway commandGateway;
 
     public ElephantAggregate() {}
 
@@ -59,7 +53,7 @@ public class ElephantAggregate {
     private void handle(EnterElephantCommand cmd) {
         log.info("[@CommandHandler] EnterElephantCommand for Id: {}", cmd.getId());
 
-        AggregateLifecycle.apply(new EnteredElephantEvent(cmd.getId(), StatusEnum.ENTER.value()));
+        AggregateLifecycle.apply(new EnteredElephantEvent(cmd.getId(), cmd.getStatus()));
     }
     @EventSourcingHandler
     private void on(EnteredElephantEvent event) {
@@ -77,7 +71,7 @@ public class ElephantAggregate {
     private void handle(ExitElephantCommand cmd) {
         log.info("[@CommandHandler] ExitElephantCommand for Id: {}", cmd.getId());
 
-        AggregateLifecycle.apply(new ExitedElephantEvent(cmd.getId(), StatusEnum.EXIT.value()));
+        AggregateLifecycle.apply(new ExitedElephantEvent(cmd.getId(), cmd.getStatus()));
     }
     @EventSourcingHandler
     private void on(ExitedElephantEvent event) {

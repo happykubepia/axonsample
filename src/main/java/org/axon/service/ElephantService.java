@@ -30,7 +30,6 @@ public class ElephantService {
     private transient QueryGateway queryGateway;
 
     private final ElephantRepository elephantRepository;
-
     @Autowired
     public ElephantService(ElephantRepository elephantRepository) {
         this.elephantRepository = elephantRepository;
@@ -40,6 +39,15 @@ public class ElephantService {
         log.info("[ElephantService] Executing create: {}", elephant.toString());
 
         ResultVO<CreateElephantCommand> retVo = new ResultVO<>();
+
+        //check validation
+        if(elephant.getWeight() < 30 || elephant.getWeight() > 200) {
+            retVo.setReturnCode(false);
+            retVo.setReturnMessage("몸무게는 30kg이상 200kb이하로 입력해 주세요.");
+            return retVo;
+        }
+
+        //send command
         CreateElephantCommand cmd = CreateElephantCommand.builder()
                 .id(RandomStringUtils.random(3, false, true))
                 .name(elephant.getName())
@@ -66,15 +74,18 @@ public class ElephantService {
 
         //-- check validation
         Elephant elephant = getEntity(id);
-        if(!(elephant.getStatus().equals(StatusEnum.READY.value()) ||
-                elephant.getStatus().equals(StatusEnum.EXIT.value()))) {
+        if(elephant.getStatus().equals(StatusEnum.ENTER.value())) {
             retVo.setReturnCode(false);
-            retVo.setReturnMessage("현재 코끼리 상태는 " + elephant.getStatus()+ ". 코끼리 상태가 'Ready' 또는 'Exit'인 경우만 넣을 수 있습니다.");
+            retVo.setReturnMessage("이미 냉장고 안에 있는 코끼리입니다.");
             return retVo;
         }
         //--send command
         try {
-            commandGateway.sendAndWait(EnterElephantCommand.builder().id(id).build(), 30, TimeUnit.SECONDS);
+            commandGateway.sendAndWait(EnterElephantCommand.builder()
+                    .id(id)
+                    .status(StatusEnum.ENTER.value())
+                    .build(), 30, TimeUnit.SECONDS);
+
             retVo.setReturnCode(true);
             retVo.setReturnMessage("Success to request enter elephant");
         } catch(Exception e) {
@@ -93,13 +104,17 @@ public class ElephantService {
         Elephant elephant = getEntity(id);
         if(!elephant.getStatus().equals(StatusEnum.ENTER.value())) {
             retVo.setReturnCode(false);
-            retVo.setReturnMessage("현재 코끼리 상태는 " + elephant.getStatus()+ ". 코끼리 상태가 'Enter'인 경우만 꺼낼 수 있습니다.");
+            retVo.setReturnMessage("냉장고 안에 있는 코끼리만 꺼낼 수 있습니다.");
             return retVo;
         }
 
         //-- send command
         try {
-            commandGateway.sendAndWait(ExitElephantCommand.builder().id(id).build(), 30, TimeUnit.SECONDS);
+            commandGateway.sendAndWait(ExitElephantCommand.builder()
+                    .id(id)
+                    .status(StatusEnum.EXIT.value())
+                    .build(), 30, TimeUnit.SECONDS);
+
             retVo.setReturnCode(true);
             retVo.setReturnMessage("Success to request exit elephant");
         } catch(Exception e) {

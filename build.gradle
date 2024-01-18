@@ -30,8 +30,6 @@ dependencies {
     //Apache utilities
     implementation 'org.apache.commons:commons-lang3:3.14.0'
 
-    //gson
-    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 bootJar {
