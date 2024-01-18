@@ -1,0 +1,44 @@
+/'
+Axon framework Sequence Diagram
+'/
+@startuml
+
+title Axon framework Sequence Diagram 
+
+participant Presentation_API as Controller
+participant Service
+queue AxonServer
+participant Aggregate 
+database EventStore
+participant EventHandler
+participant QueryHandler
+database 조회DB as Database  
+
+autonumber
+Controller -> Service: CUD 처리 요청 
+Service -> Service: Check Validation
+Service -> AxonServer: Command 발송 
+note right of Service: CommandGateway.send(command)
+Service -> Controller: Return(요청완료) 
+AxonServer -> Aggregate: Push Command 
+Aggregate <-> EventStore: Event Replay
+Aggregate -> Aggregate: Biz Logic 처리 
+Aggregate -> EventHandler: Event 생성 
+note right of Aggregate: AggregateLifecycle.apply(event)
+Aggregate -> EventStore: Event 추가 
+EventHandler -> Database: Data CUD 
+alt 실패시  
+autonumber stop 
+EventHandler --> AxonServer: 실패 Event 발송 
+note left of EventHandler: EventGateway.publish 
+end 
+autonumber 
+Controller -> Service: Data Read 요청 
+Service -> QueryHandler: Query 요청 
+note right of Service: QueryGateway.query(query)
+QueryHandler <-> Database: Read Data 
+EventHandler -> Service: Return Data 
+
+@enduml
+
+
