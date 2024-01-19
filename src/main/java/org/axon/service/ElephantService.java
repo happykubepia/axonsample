@@ -128,6 +128,7 @@ public class ElephantService {
         log.info("[ElephantService] Executing getLists");
 
         ResultVO<List<Elephant>> retVo = new ResultVO<>();
+
         List<Elephant> elephants = queryGateway.query("list", "",
                 ResponseTypes.multipleInstancesOf(Elephant.class)).join();
         if(elephants != null) {

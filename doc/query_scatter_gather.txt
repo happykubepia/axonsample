@@ -1,0 +1,24 @@
+@startuml
+hide footbox
+
+participant "주문현황" as orderstatus
+queue AxonServer as mq
+participant "주문" as order
+participant "배송" as ship
+participant "재고" as inventory
+
+autonumber 
+orderstatus -> mq: Send Query
+mq -> mq: QueryHandler 서비스 찾기 
+mq -> order: Push Query
+autonumber stop
+mq -> ship: Push Query 
+
+autonumber resume 
+mq <-- order
+autonumber stop
+mq <-- ship
+autonumber resume 
+mq -> orderstatus: Return 
+
+@enduml

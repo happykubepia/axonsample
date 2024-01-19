@@ -1,0 +1,17 @@
+
+@startuml
+component "전계좌 조회" as query_accounts
+component "KB국민은행" as bank_a
+component "신한은행" as bank_b
+component "우리은행" as bank_c
+component "New Bank" as bank_d
+
+bank_a <- query_accounts
+
+bank_b <- query_accounts
+
+bank_c <- query_accounts
+query_accounts .. bank_d
+note right of query_accounts: 요청 위해 소스 수정 
+@enduml
+

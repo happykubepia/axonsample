@@ -1,0 +1,29 @@
+@startuml
+hide footbox
+
+entity Client
+participant "주문현황" as orderstatus
+queue AxonServer as mq
+participant "주문" as order
+participant "배송" as ship
+participant "재고" as inventory
+
+autonumber 
+Client <-> orderstatus: Keep connection 
+orderstatus -> mq: Send Query
+mq -> mq: QueryHandler 서비스 찾기 
+mq -> order: Push Query
+mq -> ship: Push Query 
+
+mq <-- order: 초기결과 반환 
+mq <-- ship: 초기결과 반환 
+orderstatus <-- mq: Return 
+
+alt Query결과의 변화 발생 시 마다 수행  
+autonumber stop 
+mq <-- order
+mq <-- ship
+mq -> orderstatus: Return 
+end 
+
+@enduml

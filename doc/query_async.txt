@@ -1,0 +1,18 @@
+
+@startuml
+component "전계좌 조회" as query_accounts
+component "KB국민은행" as bank_a
+component "신한은행" as bank_b
+component "우리은행" as bank_c
+component "New Bank" as bank_d
+queue MQ
+
+query_accounts -> MQ: Request
+MQ <.. bank_a
+MQ <.. bank_b
+MQ <.. bank_c
+MQ <.. bank_d
+MQ ..> query_accounts: Return
+
+@enduml
+

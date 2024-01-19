@@ -1,7 +1,10 @@
 package org.axon.events;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.axon.command.BackToReadyCommand;
+import org.axon.command.CreateEnterCountCommand;
+import org.axon.command.UpdateEnterCountCommand;
 import org.axon.dto.StatusEnum;
 import org.axon.entity.Elephant;
 import org.axon.repository.ElephantRepository;
@@ -39,6 +42,11 @@ public class ElephantEventHandler {
 
         try {
             elephantRepository.save(elephant);
+
+            //-- Count 생성 command
+            commandGateway.send(CreateEnterCountCommand.builder()
+                    .countId("COUNT_"+event.getId())
+                    .elephantId(event.getId()).count(0).build());
         } catch(Exception e) {
             log.info(e.getMessage());
         }
@@ -58,6 +66,11 @@ public class ElephantEventHandler {
             }
             elephant.setStatus(event.getStatus());
             elephantRepository.save(elephant);
+
+            //-- Count 갱신 command
+            commandGateway.send(UpdateEnterCountCommand.builder()
+                    .countId("COUNT_"+event.getId())
+                    .elephantId(event.getId()).count(1).build());
         }
     }
     @EventHandler
