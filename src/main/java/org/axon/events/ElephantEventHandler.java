@@ -8,6 +8,7 @@ import org.axon.command.UpdateEnterCountCommand;
 import org.axon.dto.StatusEnum;
 import org.axon.entity.Elephant;
 import org.axon.repository.ElephantRepository;
+import org.axon.repository.EnterCountRepository;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.AllowReplay;
@@ -30,6 +31,8 @@ public class ElephantEventHandler {
     private transient EventGateway eventGateway;
     @Autowired
     private transient CommandGateway commandGateway;
+    @Autowired
+    private EnterCountRepository enterCountRepository;
 
     @EventHandler
     private void on(CreatedElephantEvent event) {
@@ -58,14 +61,15 @@ public class ElephantEventHandler {
 
         Elephant elephant = getEntity(event.getId());
         if(elephant != null) {
+            elephant.setStatus(event.getStatus());
+            elephantRepository.save(elephant);
+
             //무게가 100kg을 넘으면 실패 Event를 생성/발송함
             if(elephant.getWeight() > 100) {
                 log.info("==== 100Kg 넘어서 넣기 실패! 실패 이벤트 발송!");
                 eventGateway.publish(new FailedEnterElephantEvent(event.getId()));
                 return;
             }
-            elephant.setStatus(event.getStatus());
-            elephantRepository.save(elephant);
 
             //-- Count 갱신 command
             commandGateway.send(UpdateEnterCountCommand.builder()
@@ -114,5 +118,6 @@ public class ElephantEventHandler {
     private void replayAll() {
         log.info("[@ResetHandler] Executing replayAll");
         elephantRepository.deleteAll();
+        enterCountRepository.deleteAll();
     }
 }
