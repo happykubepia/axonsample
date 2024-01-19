@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Tag(name = "Replay Events API")
@@ -50,19 +52,6 @@ class ReplayEventsController {
                 .forSingleThreadedProcessing()
                 .andInitialTrackingToken(streamableMessageSource ->
                         streamableMessageSource.createTokenAt(Instant.parse(startAt)));
-
-        /*
-        //-- 시작일시와 종료일시를 지정하여 특정 기간 사이의 Event만 Replay하여 데이터를 생성할 수 있음
-        LocalDateTime start = LocalDateTime.of(2023, 1, 1, 00, 00, 00);
-        LocalDateTime end = LocalDateTime.of(2023, 3, 1, 00, 00, 00);
-        Duration duration = Duration.between(start, end);
-
-        TrackingEventProcessorConfiguration tepConfig = TrackingEventProcessorConfiguration
-        .forSingleThreadedProcessing()
-        .andInitialTrackingToken(streamableMessageSource ->
-                streamableMessageSource.createTokenSince(duration));
-
-        */
 
         configuration.eventProcessingConfiguration()
                 .eventProcessorByProcessingGroup(processingGroupName, StreamingEventProcessor.class)
