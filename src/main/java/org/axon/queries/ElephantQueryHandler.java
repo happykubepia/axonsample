@@ -13,9 +13,12 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class ElephantQueryHandler {
-    @Autowired
-    private ElephantRepository elephantRepository;
 
+    private final ElephantRepository elephantRepository;
+    @Autowired
+    public ElephantQueryHandler(ElephantRepository elephantRepository) {
+        this.elephantRepository = elephantRepository;
+    }
     //-- 코끼리 리스트를 리턴
     @QueryHandler(queryName = "list")
     private List<Elephant> getElephants(String dummy) {

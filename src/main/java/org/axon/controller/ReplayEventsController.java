@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Tag(name = "Replay Events API")
@@ -37,9 +35,9 @@ class ReplayEventsController {
     @Operation(summary = "지정한 Processing Group의 Event Handler를 지정한 시간 이후 Event만 Replay하면서 수행함")
     @Parameters({
             @Parameter(name = "processingGroup", in= ParameterIn.PATH, description = "Processing Groupname",
-                    required = true, allowEmptyValue = false, example="elephant"),
+                    required = true, example="elephant"),
             @Parameter(name = "startDateTime", in= ParameterIn.PATH, description = "시작일시(생략 시 모든 Event Replay)",
-                    required = false, allowEmptyValue = true, example = "2024-01-01T00:00:00.00Z")
+                    allowEmptyValue = true, example = "2024-01-01T00:00:00.00Z")
     })
     String replayEventFor(
             @PathVariable(name = "processingGroup") String processingGroupName,

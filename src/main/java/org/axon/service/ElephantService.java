@@ -24,16 +24,17 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class ElephantService {
-    @Autowired
-    private transient CommandGateway commandGateway;
-    @Autowired
-    private transient QueryGateway queryGateway;
 
+    private transient final CommandGateway commandGateway;
+    private transient final QueryGateway queryGateway;
     private final ElephantRepository elephantRepository;
     @Autowired
-    public ElephantService(ElephantRepository elephantRepository) {
+    public ElephantService(CommandGateway commandGateway, QueryGateway queryGateway, ElephantRepository elephantRepository) {
+        this.commandGateway = commandGateway;
+        this.queryGateway = queryGateway;
         this.elephantRepository = elephantRepository;
     }
+
 
     public ResultVO<CreateElephantCommand> create(ElephantDTO elephant) {
         log.info("[ElephantService] Executing create: {}", elephant.toString());

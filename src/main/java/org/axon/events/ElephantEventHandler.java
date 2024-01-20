@@ -1,7 +1,6 @@
 package org.axon.events;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.axon.command.BackToReadyCommand;
 import org.axon.command.CreateEnterCountCommand;
 import org.axon.command.UpdateEnterCountCommand;
@@ -25,14 +24,19 @@ import java.util.Optional;
 @ProcessingGroup("elephant")      //전체 Event Replay시 대상 class를 구별하기 위해 부여
 @AllowReplay                    //Event Replay를 활성화 함. 비활성화할 EventHandler에는 @DisallowReplay를 지정
 public class ElephantEventHandler {
+
+    private final ElephantRepository elephantRepository;
+    private transient final EventGateway eventGateway;
+    private transient final CommandGateway commandGateway;
+    private final EnterCountRepository enterCountRepository;
     @Autowired
-    private ElephantRepository elephantRepository;
-    @Autowired
-    private transient EventGateway eventGateway;
-    @Autowired
-    private transient CommandGateway commandGateway;
-    @Autowired
-    private EnterCountRepository enterCountRepository;
+    public ElephantEventHandler(ElephantRepository elephantRepository, EventGateway eventGateway,
+                                CommandGateway commandGateway, EnterCountRepository enterCountRepository) {
+        this.elephantRepository = elephantRepository;
+        this.eventGateway = eventGateway;
+        this.commandGateway = commandGateway;
+        this.enterCountRepository = enterCountRepository;
+    }
 
     @EventHandler
     private void on(CreatedElephantEvent event) {
@@ -110,7 +114,7 @@ public class ElephantEventHandler {
 
     private Elephant getEntity(String id) {
         Optional<Elephant> optElephant = elephantRepository.findById(id);
-        return optElephant.isPresent() ? optElephant.get() : null;
+        return optElephant.orElse(null);
     }
 
     //===================== 전체 이벤트 Replay하여 DB에 최종 상태 저장 ===========
